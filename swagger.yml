@@ -46,7 +46,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SearchIdentitiesResponse'
   /identity/{id}/verify:
-    get:
+    post:
       summary: Verify an Identity
       operationId: verifyIdentity
       tags:
