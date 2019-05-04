@@ -17,14 +17,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Identity'
+              $ref: '#/components/schemas/IdentityRequest'
       responses:
         '200':
           description: The newly created Identity
           content:
             application/json:    
               schema:
-                $ref: '#/components/schemas/IdentityResponse'
+                $ref: '#/components/schemas/Identity'
   /identity/search:
     post:
       summary: Search for Identities
@@ -45,6 +45,33 @@ paths:
             application/json:    
               schema:
                 $ref: '#/components/schemas/SearchIdentitiesResponse'
+  /identity/{id}/verify:
+    get:
+      summary: Verify an Identity
+      operationId: verifyIdentity
+      tags:
+        - identity
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique Identity ID
+      responses:
+        '200':
+          description: Verified Identity
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/Identity'
+        '404':
+          description: Requested Identity is not found
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ResponseError"
+
   /identity/{id}:
     get:
       summary: Retrieve an Identity
@@ -64,7 +91,7 @@ paths:
           content:
             application/json:    
               schema:
-                $ref: '#/components/schemas/IdentityResponse'
+                $ref: '#/components/schemas/Identity'
         '404':
           description: Requested Identity is not found
           content:
@@ -89,7 +116,7 @@ paths:
           content:
             application/json:    
               schema:
-                $ref: '#/components/schemas/IdentityResponse'
+                $ref: '#/components/schemas/Identity'
         '404':
           description: Deleted Identity is not found
           content:
@@ -99,7 +126,7 @@ paths:
 
 components:
   schemas:
-    Identity:
+    IdentityRequest:
       required:
         - fist_name
         - last_name
@@ -120,41 +147,35 @@ components:
         zipcode:
           description: 5 digit ZIPCode of the Identity
           type: string
-          format: 'zip-code'
+          pattern: '^\d{5}$'
         date_of_birth:
           description: The DOB of the Identity
           type: string
           format: date
-        promotion_id:
-          description: The unique ID for an associated promotion
-          type: string
-          format: uuid
     
-    IdentityResponse:
+    Identity:
       allOf:
         - type: object
           required:
             - id
+            - verified
           properties:
             id:
               description: The unique ID for a Identity 
               type: string
               format: uuid
-        - $ref: '#/components/schemas/Identity'
-        
-          
+            verified:
+              description: True if Identity was successfully Verified, False if not
+              type: boolean
+        - $ref: '#/components/schemas/IdentityRequest'
+    
     SearchIdentitiesRequest:
       required:
-        - id
         - fist_name
         - last_name
-        - phone_number
         - zipcode
         - date_of_birth
       properties:
-        id:
-          description: The unique ID for a Identity 
-          type: string
         fist_name:
           description: The legal first name of the Identity
           type: string
@@ -164,11 +185,13 @@ components:
         phone_number:
           description: The contact phone number of the Identity
           type: string
+          pattern: '^\d{3}-\d{3}-\d{4}$'
         zipcode:
           description: 5 digit ZIPCode of the Identity
           type: string
+          pattern: '^\d{5}$'
         date_of_birth:
-          description: The DOB of the Identity - mm/dd/yyyy
+          description: The DOB of the Identity
           type: string
           format: date
 
@@ -180,7 +203,7 @@ components:
           description: A list of Identities that match the search Criteria
           type: array
           items:
-            $ref: "#/components/schemas/IdentityResponse"
+            $ref: "#/components/schemas/Identity"
 
     ResponseError:
       required:
