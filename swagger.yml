@@ -11,6 +11,10 @@ paths:
       operationId: createIdentity
       tags:
         - identity
+      parameters:
+        - $ref: "#/components/parameters/xApiKey"
+        - $ref: "#/components/parameters/clientId"
+        - $ref: "#/components/parameters/locationId"
       requestBody:
         description: Create an Identity
         required: true
@@ -31,6 +35,10 @@ paths:
       operationId: searchIdentities
       tags:
         - identity
+      parameters:
+        - $ref: "#/components/parameters/xApiKey"
+        - $ref: "#/components/parameters/clientId"
+        - $ref: "#/components/parameters/locationId"
       requestBody:
         description: Search for Identities - Provide at least one filter data; if none are provided the results array will be empty. All provided filter data will be ANDed.
         required: true
@@ -52,12 +60,10 @@ paths:
       tags:
         - identity
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: The unique Identity ID
+        - $ref: "#/components/parameters/xApiKey"
+        - $ref: "#/components/parameters/clientId"
+        - $ref: "#/components/parameters/locationId"
+        - $ref: "#/components/parameters/identityId"
       responses:
         '200':
           description: Verified Identity
@@ -79,12 +85,10 @@ paths:
       tags:
         - identity
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: The unique Identity ID
+        - $ref: "#/components/parameters/xApiKey"
+        - $ref: "#/components/parameters/clientId"
+        - $ref: "#/components/parameters/locationId"
+        - $ref: "#/components/parameters/identityId"
       responses:
         '200':
           description: Requested Identity
@@ -104,12 +108,10 @@ paths:
       tags:
         - identity
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: The unique Identity ID
+        - $ref: "#/components/parameters/xApiKey"
+        - $ref: "#/components/parameters/clientId"
+        - $ref: "#/components/parameters/locationId"
+        - $ref: "#/components/parameters/identityId"
       responses:
         '200':
           description: Deleted Identity
@@ -125,6 +127,36 @@ paths:
                 $ref: "#/components/schemas/ResponseError"
 
 components:
+  parameters:
+    xApiKey:
+      in: header
+      name: x-api-key
+      description: This will be obtained from the API provider
+      required: true
+      schema:
+        type: string
+    clientId:
+      in: header
+      name: client_id
+      description: Unique Identifier for the Vendor obtained from the API provider
+      required: true
+      schema:
+        type: string
+    locationId:
+      in: header
+      name: location_id
+      description: Unique Identifier for the Vendor Location obtained from the API provider
+      required: true
+      schema:
+        type: string
+    identityId:
+      in: path
+      name: id
+      description: The unique Identity ID
+      required: true
+      schema:
+        type: string
+
   schemas:
     IdentityRequest:
       required:
