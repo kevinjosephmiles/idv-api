@@ -1,0 +1,196 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: SmartPay IDV API
+servers:
+  - url: http://api.smartpay.com/v1
+paths:
+  /identity:
+    post:
+      summary: Create an Identity
+      operationId: createIdentity
+      tags:
+        - identity
+      requestBody:
+        description: Create an Identity
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Identity'
+      responses:
+        '200':
+          description: The newly created Identity
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/IdentityResponse'
+  /identity/search:
+    post:
+      summary: Search for Identities
+      operationId: searchIdentities
+      tags:
+        - identity
+      requestBody:
+        description: Search for Identities - Provide at least one filter data; if none are provided the results array will be empty. All provided filter data will be ANDed.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchIdentitiesRequest'
+      responses:
+        '200':
+          description: List of Identities matching search criteria - No matches returns empty Array
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/SearchIdentitiesResponse'
+  /identity/{id}:
+    get:
+      summary: Retrieve an Identity
+      operationId: getIdentity
+      tags:
+        - identity
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique Identity ID
+      responses:
+        '200':
+          description: Requested Identity
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/IdentityResponse'
+        '404':
+          description: Requested Identity is not found
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ResponseError"
+    delete:
+      summary: Delete a Identity
+      operationId: deleteIdentity
+      tags:
+        - identity
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique Identity ID
+      responses:
+        '200':
+          description: Deleted Identity
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/IdentityResponse'
+        '404':
+          description: Deleted Identity is not found
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ResponseError"
+
+components:
+  schemas:
+    Identity:
+      required:
+        - fist_name
+        - last_name
+        - phone_number
+        - zipcode
+        - date_of_birth
+      properties:
+        fist_name:
+          description: The legal first name of the Identity
+          type: string
+        last_name:
+          description: The legal last name of the Identity
+          type: string
+        phone_number:
+          description: The contact phone number of the Identity
+          type: string
+          pattern: '^\d{3}-\d{3}-\d{4}$'
+        zipcode:
+          description: 5 digit ZIPCode of the Identity
+          type: string
+          format: 'zip-code'
+        date_of_birth:
+          description: The DOB of the Identity
+          type: string
+          format: date
+        promotion_id:
+          description: The unique ID for an associated promotion
+          type: string
+          format: uuid
+    
+    IdentityResponse:
+      allOf:
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              description: The unique ID for a Identity 
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/Identity'
+        
+          
+    SearchIdentitiesRequest:
+      required:
+        - id
+        - fist_name
+        - last_name
+        - phone_number
+        - zipcode
+        - date_of_birth
+      properties:
+        id:
+          description: The unique ID for a Identity 
+          type: string
+        fist_name:
+          description: The legal first name of the Identity
+          type: string
+        last_name:
+          description: The legal last name of the Identity
+          type: string
+        phone_number:
+          description: The contact phone number of the Identity
+          type: string
+        zipcode:
+          description: 5 digit ZIPCode of the Identity
+          type: string
+        date_of_birth:
+          description: The DOB of the Identity - mm/dd/yyyy
+          type: string
+          format: date
+
+    SearchIdentitiesResponse:
+      required:
+        - results
+      properties:
+        results:
+          description: A list of Identities that match the search Criteria
+          type: array
+          items:
+            $ref: "#/components/schemas/IdentityResponse"
+
+    ResponseError:
+      required:
+        - error_code
+        - error_description
+      properties:
+        error_code:
+          type: string
+          description: The error code returned whether the API call was successful or not
+        error_description:
+          type: string
+          description: The description of the error code
+
